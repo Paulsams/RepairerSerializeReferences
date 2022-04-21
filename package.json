@@ -1,0 +1,10 @@
+{
+  "name": "com.paulsams.repairer-serialize-references",
+  "version": "1.0.0",
+  "displayName": "RepairerSerializeReferences",
+  "dependencies": {
+    "com.paulsams.misc-utilities": "1.1.0"
+  },
+  "description": "This package allows you to use the [ChoiceReference] attribute to make a popup interaction to select a subclass from which the base class that you specified as the field type inherits.\nLists and arrays are also supported, as is the fact that this attribute will be used again in subclasses.\n\nThere are also arguments for my attribute:\n1) nullable - allows you to leave the selection of null assignment in the popup. By default, false.",
+  "unity": "2021.2"
+}

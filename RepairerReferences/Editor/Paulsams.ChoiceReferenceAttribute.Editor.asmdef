@@ -1,0 +1,17 @@
+{
+    "name": "Paulsams.RepairerSerializeReferences.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:b0662ca21412c3740ae414e20bbbf326",
+        "GUID:ceda4d113c3779349b26462b36fd1123"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
