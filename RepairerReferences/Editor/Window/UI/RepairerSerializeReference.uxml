@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <ui:Template name="ChangerContainer" src="project://database/Packages/com.paulsams.choice-reference-attribute/RepairerReferences/Editor/Window/UI/Templates/ChangerContainer.uxml?fileID=9197481963319205126&amp;guid=a9290bcc1273e3b489f36d1ecb5198fb&amp;type=3#ChangerContainer" />
-    <ui:Template name="TwoValuesContainer" src="project://database/Packages/com.paulsams.choice-reference-attribute/RepairerReferences/Editor/Window/UI/Templates/TwoValuesContainer.uxml?fileID=9197481963319205126&amp;guid=55b4eb8feedea91479c1b75360424a8e&amp;type=3#TwoValuesContainer" />
-    <Style src="project://database/Packages/com.paulsams.choice-reference-attribute/RepairerReferences/Editor/Window/UI/RepairerSerializeReference.uss?fileID=7433441132597879392&amp;guid=256855f230963884dbb467227597b592&amp;type=3#RepairerSerializeReference" />
+    <ui:Template name="ChangerContainer" src="project://database/Packages/com.paulsams.repairer-serialize-references/RepairerReferences/Editor/Window/UI/Templates/ChangerContainer.uxml?fileID=9197481963319205126&amp;guid=a9290bcc1273e3b489f36d1ecb5198fb&amp;type=3#ChangerContainer" />
+    <ui:Template name="TwoValuesContainer" src="project://database/Packages/com.paulsams.repairer-serialize-references/RepairerReferences/Editor/Window/UI/Templates/TwoValuesContainer.uxml?fileID=9197481963319205126&amp;guid=55b4eb8feedea91479c1b75360424a8e&amp;type=3#TwoValuesContainer" />
+    <Style src="project://database/Packages/com.paulsams.repairer-serialize-references/RepairerReferences/Editor/Window/UI/RepairerSerializeReference.uss?fileID=7433441132597879392&amp;guid=256855f230963884dbb467227597b592&amp;type=3#RepairerSerializeReference" />
     <uie:Toolbar name="MainToolbar">
         <uie:ToolbarButton text="Update" display-tooltip-when-elided="true" name="Update" />
     </uie:Toolbar>
