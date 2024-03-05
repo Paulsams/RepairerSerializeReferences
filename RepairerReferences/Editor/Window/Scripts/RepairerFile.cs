@@ -27,7 +27,7 @@ namespace ChoiceReferenceEditor.Repairer
             _fileLines = File.ReadAllLines(_path);
         }
 
-        public delegate bool GetMissingTypeData(out MissingTypeData missingType);
+        public delegate bool GetterMissingTypeData(out MissingTypeData missingType);
 
         public void Repair(Func<bool> callbackForNextLine)
         {
@@ -48,7 +48,7 @@ namespace ChoiceReferenceEditor.Repairer
             AssetDatabase.Refresh();
         }
 
-        public bool CheckNeedLineAndReplasedIt(ManagedReferenceMissingType missingType)
+        public bool CheckNeedLineAndReplacedIt(ManagedReferenceMissingType missingType)
         {
             string rid = $"rid: {missingType.referenceId}";
             string oldTypeData = $"type: {{class: {missingType.className}, ns: {missingType.namespaceName}, asm: {missingType.assemblyName}}}";

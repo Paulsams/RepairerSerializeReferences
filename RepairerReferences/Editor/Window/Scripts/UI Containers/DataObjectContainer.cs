@@ -1,9 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace ChoiceReferenceEditor.Repairer
@@ -47,9 +41,9 @@ namespace ChoiceReferenceEditor.Repairer
             UpdateContent();
         }
 
-        public void ChangeCollectionDatas(IReadonlyCollectionWithEvent<MissingTypeData> missingTypeDatas)
+        public void ChangeCollectionData(IReadonlyCollectionWithEvent<MissingTypeData> missingTypesData)
         {
-            _missingTypeDatas = missingTypeDatas;
+            _missingTypeDatas = missingTypesData;
             _changerIndex.ChangeCollection(_missingTypeDatas);
 
             UpdateContent();

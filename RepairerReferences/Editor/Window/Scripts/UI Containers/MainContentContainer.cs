@@ -1,9 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace ChoiceReferenceEditor.Repairer
@@ -93,17 +89,17 @@ namespace ChoiceReferenceEditor.Repairer
             if (_missingTypeContainers.Count == 0)
             {
                 _container.style.display = DisplayStyle.None;
-                DataObjectContainer.ChangeCollectionDatas(null);
+                DataObjectContainer.ChangeCollectionData(null);
                 return;
             }
 
             ResetContent();
-            ChangeCollectionDatas();
+            ChangeCollectionData();
         }
 
-        private void ChangeCollectionDatas()
+        private void ChangeCollectionData()
         {
-            DataObjectContainer.ChangeCollectionDatas(CurrentContainerMissingTypes.ManagedReferencesMissingTypeDatas);
+            DataObjectContainer.ChangeCollectionData(CurrentContainerMissingTypes.ManagedReferencesMissingTypeDatas);
         }
 
         private void ResetContent()

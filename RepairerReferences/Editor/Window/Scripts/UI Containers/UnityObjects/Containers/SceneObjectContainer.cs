@@ -1,6 +1,4 @@
 using Paulsams.MicsUtils;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.SceneManagement;
@@ -21,7 +19,8 @@ namespace ChoiceReferenceEditor.Repairer
         private Dictionary<int, MonoBehaviour> _instanceIDToObject = new Dictionary<int, MonoBehaviour>();
         private SceneObjectData _currentSceneObject;
 
-        public SceneObjectContainer(VisualElement contentContainer) : base(contentContainer.Q<VisualElement>("SceneObjectContainer"))
+        public SceneObjectContainer(VisualElement contentContainer)
+            : base(contentContainer.Q<VisualElement>("SceneObjectContainer"))
         {
             _sceneNameField = _container.Q<TextField>("SceneName");
             _openSceneButton = _container.Q<Button>("OpenScene");

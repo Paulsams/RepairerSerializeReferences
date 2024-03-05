@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using Paulsams.MicsUtils;
+using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
 using UnityEngine.SceneManagement;
 
@@ -16,11 +17,10 @@ namespace ChoiceReferenceEditor.Repairer
 
         [SerializeField] private VisualTreeAsset _treeAsset;
 
-        [SerializeField] private ListWithEvent<ContainerMissingTypes> _missingTypes;
-
+        private ListWithEvent<ContainerMissingTypes> _missingTypes;
         private MainContentContainer _mainContentContainer;
 
-        [MenuItem("Tools/RepairerSerializeReference")]
+        [MenuItem("Window/RepairerSerializeReference")]
         public static void ShowWindow()
         {
             RepairerSerializeReference editorWindow = GetWindow<RepairerSerializeReference>();
@@ -30,13 +30,13 @@ namespace ChoiceReferenceEditor.Repairer
 
         private void Init()
         {
-            Dictionary<TypeData, ContainerMissingTypes> missingTypes = new Dictionary<TypeData, ContainerMissingTypes>();
+            var missingTypes = new Dictionary<TypeData, ContainerMissingTypes>();
 
             void AddMissingType(ManagedReferenceMissingType missingType, BaseUnityObjectData unityObject)
             {
-                TypeData typeData = new TypeData(missingType);
-                MissingTypeData missingTypeData = new MissingTypeData(missingType, unityObject);
-                if (missingTypes.TryGetValue(typeData, out ContainerMissingTypes containerMissingTypes) == false)
+                var typeData = new TypeData(missingType);
+                var missingTypeData = new MissingTypeData(missingType, unityObject);
+                if (missingTypes.TryGetValue(typeData, out var containerMissingTypes) == false)
                 {
                     containerMissingTypes = new ContainerMissingTypes(typeData);
                     missingTypes.Add(typeData, containerMissingTypes);
@@ -45,9 +45,10 @@ namespace ChoiceReferenceEditor.Repairer
                 containerMissingTypes.Add(missingTypeData);
             }
 
-            Scene previewScene = UnityEditor.SceneManagement.EditorSceneManager.NewPreviewScene();
+            Scene previewScene = EditorSceneManager.NewPreviewScene();
 
-            foreach (var pathToPrefab in AssetDatabaseUtilities.GetPathToAllPrefabsAssets())
+            foreach (var pathToPrefab in AssetDatabaseUtilities.GetPathToAllPrefabsAssets()
+                         .Where((path) => path.StartsWith("Assets/")))
             {
                 var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(pathToPrefab);
                 PrefabUtility.LoadPrefabContentsIntoPreviewScene(pathToPrefab, previewScene);
@@ -63,7 +64,7 @@ namespace ChoiceReferenceEditor.Repairer
                     {
                         foreach (var missingType in SerializationUtility.GetManagedReferencesWithMissingTypes(monoBehaviour))
                         {
-                            PrefabObjectData prefabObject = new PrefabObjectData(componentsPrefab[i].gameObject, pathToPrefab);
+                            var prefabObject = new PrefabObjectData(componentsPrefab[i].gameObject, pathToPrefab);
 
                             AddMissingType(missingType, prefabObject);
                         }
@@ -73,36 +74,36 @@ namespace ChoiceReferenceEditor.Repairer
                 DestroyImmediate(copyPrefab);
             }
 
-            UnityEditor.SceneManagement.EditorSceneManager.ClosePreviewScene(previewScene);
+            EditorSceneManager.ClosePreviewScene(previewScene);
 
-            try//if (missingTypes.Count == 0)
+            try
             {
-                foreach (var scene in AssetDatabaseUtilities.GetPathsToAllScenesInProject())
+                foreach (var scene in AssetDatabaseUtilities.GetPathsToAllScenesInProject()
+                             .Where((path) => path.path.StartsWith("Assets/")))
                 {
                     var gameObjects = scene.GetRootGameObjects();
 
-                    for (int i = 0; i < gameObjects.Length; ++i)
+                    foreach (var objectOnScene in gameObjects)
                     {
-                        foreach (var monoBehaviour in gameObjects[i].GetComponentsInChildren<MonoBehaviour>())
+                        foreach (var monoBehaviour in objectOnScene.GetComponentsInChildren<MonoBehaviour>())
                         {
-                            if (SerializationUtility.HasManagedReferencesWithMissingTypes(monoBehaviour))
+                            if (SerializationUtility.HasManagedReferencesWithMissingTypes(monoBehaviour) == false)
+                                continue;
+                            
+                            foreach (var missingType in SerializationUtility.GetManagedReferencesWithMissingTypes(monoBehaviour))
                             {
-                                foreach (var missingType in SerializationUtility.GetManagedReferencesWithMissingTypes(monoBehaviour))
-                                {
-                                    SceneObjectData sceneObject = new SceneObjectData(monoBehaviour.GetLocalIdentifierInFile(), scene);
-                                    AddMissingType(missingType, sceneObject);
-                                }
+                                var sceneObject = new SceneObjectData(monoBehaviour.GetLocalIdentifierInFile(), scene);
+                                AddMissingType(missingType, sceneObject);
                             }
                         }
                     }
                 }
             }
-            catch
-            {
-                
-            }
+            catch { /*ignored*/ }
 
-            _missingTypes = new ListWithEvent<ContainerMissingTypes>(missingTypes.Select((typeAndContainer) => typeAndContainer.Value).ToList());
+            _missingTypes = new ListWithEvent<ContainerMissingTypes>(missingTypes
+                .Select((typeAndContainer) => typeAndContainer.Value)
+                .ToList());
         }
 
         private void UpdateAll()
@@ -112,10 +113,7 @@ namespace ChoiceReferenceEditor.Repairer
             InitContainers();
         }
 
-        private void InitContainers()
-        {
-            _mainContentContainer.Init(_missingTypes);
-        }
+        private void InitContainers() => _mainContentContainer.Init(_missingTypes);
 
         private void CreateGUI()
         {
@@ -132,8 +130,6 @@ namespace ChoiceReferenceEditor.Repairer
             _mainContentContainer = new MainContentContainer(editorWindow);
             _mainContentContainer.ChangedContainerReferences += OnChangedContainerReferences;
             _mainContentContainer.ChangedSingleReference += OnChangedSingleReference;
-
-            //InitContainers();
         }
 
         private void Dispose()
@@ -146,10 +142,7 @@ namespace ChoiceReferenceEditor.Repairer
             ManagedReferenceMissingType missingType = missingTypeData.Data;
 
             var repairer = new RepairerFile(type, missingTypeData.UnityObject.LocalAssetPath);
-            repairer.Repair(() =>
-            {
-                return repairer.CheckNeedLineAndReplasedIt(missingType);
-            });
+            repairer.Repair(() => repairer.CheckNeedLineAndReplacedIt(missingType));
 
             _missingTypes[_mainContentContainer.CurrentIndex].Remove(missingTypeData);
             if (_missingTypes[_mainContentContainer.CurrentIndex].ManagedReferencesMissingTypeDatas.Collection.Count == 0)
@@ -158,21 +151,21 @@ namespace ChoiceReferenceEditor.Repairer
 
         private void OnChangedContainerReferences(Type type, ContainerMissingTypes containerMissingTypes)
         {
-            Dictionary<string, List<ManagedReferenceMissingType>> fileDatas = new Dictionary<string, List<ManagedReferenceMissingType>>();
+            Dictionary<string, List<ManagedReferenceMissingType>> filesData = new Dictionary<string, List<ManagedReferenceMissingType>>();
 
             foreach (var missingType in containerMissingTypes.ManagedReferencesMissingTypeDatas.Collection)
             {
                 var localAssetPath = missingType.UnityObject.LocalAssetPath;
-                if (fileDatas.TryGetValue(localAssetPath, out List<ManagedReferenceMissingType> missingTypes) == false)
+                if (filesData.TryGetValue(localAssetPath, out var missingTypes) == false)
                 {
                     missingTypes = new List<ManagedReferenceMissingType>();
-                    fileDatas.Add(localAssetPath, missingTypes);
+                    filesData.Add(localAssetPath, missingTypes);
                 }
 
                 missingTypes.Add(missingType.Data);
             }
 
-            foreach (var fileData in fileDatas)
+            foreach (var fileData in filesData)
             {
                 string localAssetPath = fileData.Key;
                 List<ManagedReferenceMissingType> missingTypes = fileData.Value;
@@ -182,7 +175,7 @@ namespace ChoiceReferenceEditor.Repairer
                 {
                     for (int i = missingTypes.Count - 1; i >= 0; --i)
                     {
-                        if (repairer.CheckNeedLineAndReplasedIt(missingTypes[i]))
+                        if (repairer.CheckNeedLineAndReplacedIt(missingTypes[i]))
                         {
                             missingTypes.RemoveAt(i);
                             break;
@@ -196,9 +189,6 @@ namespace ChoiceReferenceEditor.Repairer
             _missingTypes.RemoveAt(_mainContentContainer.CurrentIndex);
         }
 
-        private void OnDisable()
-        {
-            Dispose();
-        }
+        private void OnDisable() => Dispose();
     }
 }
