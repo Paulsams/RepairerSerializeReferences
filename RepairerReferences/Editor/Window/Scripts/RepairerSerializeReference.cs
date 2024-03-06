@@ -28,8 +28,30 @@ namespace ChoiceReferenceEditor.Repairer
             editorWindow.minSize = _minSizeWindow;
         }
 
-        private void Init()
+        private bool TryInit()
         {
+            var allCurrentDirtyScenes = EditorSceneManager
+                .GetSceneManagerSetup()
+                .Where(sceneSetup => sceneSetup.isLoaded)
+                .Select(sceneSetup => EditorSceneManager.GetSceneByPath(sceneSetup.path))
+                .Where(scene => scene.isDirty)
+                .ToArray();
+            
+            if (allCurrentDirtyScenes.Length != 0)
+            {
+                bool result = EditorUtility.DisplayDialog(
+                    "Current active scene(s) is dirty",
+                    "Please save all active scenes as they may be overwritten",
+                    "Save active scene and Continue",
+                    "Cancel update"
+                );
+                if (result == false)
+                    return false;
+
+                foreach (var dirtyScene in allCurrentDirtyScenes)
+                    EditorSceneManager.SaveScene(dirtyScene);
+            }
+            
             var missingTypes = new Dictionary<TypeData, ContainerMissingTypes>();
 
             void AddMissingType(ManagedReferenceMissingType missingType, BaseUnityObjectData unityObject)
@@ -104,13 +126,15 @@ namespace ChoiceReferenceEditor.Repairer
             _missingTypes = new ListWithEvent<ContainerMissingTypes>(missingTypes
                 .Select((typeAndContainer) => typeAndContainer.Value)
                 .ToList());
+
+            return true;
         }
 
         private void UpdateAll()
         {
             Dispose();
-            Init();
-            InitContainers();
+            if (TryInit())
+                InitContainers();
         }
 
         private void InitContainers() => _mainContentContainer.Init(_missingTypes);
@@ -135,6 +159,7 @@ namespace ChoiceReferenceEditor.Repairer
         private void Dispose()
         {
             _missingTypes = null;
+            _mainContentContainer.Reset();
         }
 
         private void OnChangedSingleReference(Type type, MissingTypeData missingTypeData)

@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine.SceneManagement;
 
 namespace ChoiceReferenceEditor.Repairer
@@ -6,15 +7,14 @@ namespace ChoiceReferenceEditor.Repairer
     {
         public readonly int LocalIdentifierInFile;
         public readonly string SceneName;
-        public readonly string ScenePath;
-
-        public override string LocalAssetPath => ScenePath;
+    
+        public override GUID AssetGuid { get; }
 
         public SceneObjectData(int localIdentifierInFile, Scene scene)
         {
             LocalIdentifierInFile = localIdentifierInFile;
             SceneName = scene.name;
-            ScenePath = scene.path;
+            AssetGuid = AssetDatabase.GUIDFromAssetPath(scene.path);
         }
 
         public override UnityObjectBaseContainer ChangeContent(DataObjectContainer dataObjectContainer)

@@ -17,13 +17,16 @@ namespace ChoiceReferenceEditor.Repairer
 
         private UnityObjectBaseContainer _currentContainerForObject;
 
-        private IReadonlyCollectionWithEvent<MissingTypeData> _missingTypeDatas;
+        private IReadonlyCollectionWithEvent<MissingTypeData> _missingTypesData;
 
-        public MissingTypeData CurrentMissingType => _missingTypeDatas[_changerIndex.CurrentIndex];
+        public MissingTypeData CurrentMissingType => _missingTypesData[_changerIndex.CurrentIndex];
 
         public DataObjectContainer(VisualElement mainContentContainer)
         {
-            _dataObjectContainer = mainContentContainer.Q<VisualElement>("DataObjectContainer").Q<VisualElement>("ContentContainer").contentContainer;
+            _dataObjectContainer = mainContentContainer
+                .Q<VisualElement>("DataObjectContainer")
+                .Q<VisualElement>("ContentContainer")
+                .contentContainer;
             _miscInfoContainer = _dataObjectContainer.Q<VisualElement>("MiscInfoContainer");
 
             _referenceIdField = _miscInfoContainer.Q<LongField>("ReferenceId");
@@ -36,25 +39,24 @@ namespace ChoiceReferenceEditor.Repairer
             PrefabObjectContainer = new PrefabObjectContainer(_dataObjectContainer);
         }
 
-        private void OnChangedIndex()
+        public void Reset()
         {
-            UpdateContent();
+            _currentContainerForObject?.Disable();
+            _currentContainerForObject = null;
         }
 
         public void ChangeCollectionData(IReadonlyCollectionWithEvent<MissingTypeData> missingTypesData)
         {
-            _missingTypeDatas = missingTypesData;
-            _changerIndex.ChangeCollection(_missingTypeDatas);
+            _missingTypesData = missingTypesData;
+            _changerIndex.ChangeCollection(_missingTypesData);
 
             UpdateContent();
         }
 
         public void UpdateContent()
         {
-            _currentContainerForObject?.Disable();
-            _currentContainerForObject = null;
-
-            if (_missingTypeDatas == null || _missingTypeDatas.Count == 0)
+            Reset();
+            if (_missingTypesData == null || _missingTypesData.Count == 0)
                 return;
 
             MissingTypeData missingType = CurrentMissingType;
@@ -65,5 +67,7 @@ namespace ChoiceReferenceEditor.Repairer
             _currentContainerForObject = missingType.UnityObject.ChangeContent(this);
             _currentContainerForObject.Enable();
         }
+        
+        private void OnChangedIndex() => UpdateContent();
     }
 }

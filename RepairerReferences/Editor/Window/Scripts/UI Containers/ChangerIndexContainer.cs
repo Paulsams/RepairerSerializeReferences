@@ -38,17 +38,13 @@ namespace ChoiceReferenceEditor.Repairer
         public void ChangeCollection(IReadonlyCollectionWithEvent collection)
         {
             if (_collection != null)
-            {
                 _collection.Removed -= OnRemovedIndex;
-            }
 
             _currentIndex = 0;
             _collection = collection;
             
             if (_collection != null)
-            {
                 _collection.Removed += OnRemovedIndex;
-            }
 
             Update();
         }
@@ -56,13 +52,9 @@ namespace ChoiceReferenceEditor.Repairer
         private void Update()
         {
             if (_collection != null && _collection.Count != 0)
-            {
                 UpdateTextAndButtons();
-            }
             else
-            {
                 ChangeContentFromCollectionEmpty();
-            }
         }
 
         private void ChangeContentFromCollectionEmpty()

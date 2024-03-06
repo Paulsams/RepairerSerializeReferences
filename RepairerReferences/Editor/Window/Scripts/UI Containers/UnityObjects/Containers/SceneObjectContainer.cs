@@ -1,6 +1,7 @@
 using Paulsams.MicsUtils;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -15,7 +16,7 @@ namespace ChoiceReferenceEditor.Repairer
         private readonly Button _openSceneButton;
         private readonly ObjectField _objectField;
 
-        private string _pathToCurrentCashedScene;
+        private GUID _guidUnityCachedScene;
         private Dictionary<int, MonoBehaviour> _instanceIDToObject = new Dictionary<int, MonoBehaviour>();
         private SceneObjectData _currentSceneObject;
 
@@ -29,75 +30,82 @@ namespace ChoiceReferenceEditor.Repairer
             _openSceneButton.clicked += OnWantOpenScene;
         }
 
-        public MonoBehaviour GetMonoObject(SceneObjectData sceneObject)
-        {
-            Scene activeScene = SceneManager.GetActiveScene();
-            if (activeScene.name != _currentSceneObject.SceneName)
-                OpenScene(sceneObject);
-
-            return _instanceIDToObject[sceneObject.LocalIdentifierInFile];
-        }
-
         public void ChangeContent(SceneObjectData sceneObject)
         {
             _currentSceneObject = sceneObject;
             _sceneNameField.SetValueWithoutNotify(_currentSceneObject.SceneName);
 
-            if (_pathToCurrentCashedScene != _currentSceneObject.ScenePath)
-                FindAllComponentInCurrentSceneAndUpdateSceneObjectContainer();
+            if (_guidUnityCachedScene == _currentSceneObject.AssetGuid)
+                ChangeStateButtonOpenSceneAndUnityObjectField(true);
             else
-                UpdateButtonOpenSceneAndUnityObjectField();
+                ChangeStateCurrentScene(
+                    EditorSceneManager
+                        .GetSceneManagerSetup()
+                        .Any(sceneSetup => sceneSetup.path == _currentSceneObject.LocalAssetPath)
+                );
         }
 
         public override void Enable()
         {
             base.Enable();
 
-            EditorSceneManager.activeSceneChangedInEditMode += OnSceneChanged;
+            EditorSceneManager.sceneOpened += OnSceneOpened;
+            EditorSceneManager.sceneClosed += OnSceneClosed;
         }
 
         public override void Disable()
         {
             base.Disable();
 
-            EditorSceneManager.activeSceneChangedInEditMode -= OnSceneChanged;
+            EditorSceneManager.sceneOpened -= OnSceneOpened;
+            EditorSceneManager.sceneClosed -= OnSceneClosed;
         }
 
-        private void FindAllComponentInCurrentSceneAndUpdateSceneObjectContainer()
+        private void ChangeStateCurrentScene(bool state)
         {
-            FindAllComponentInCurrentScene();
-            UpdateButtonOpenSceneAndUnityObjectField();
+            if (state)
+                FindAllComponentInCurrentScene();
+            ChangeStateButtonOpenSceneAndUnityObjectField(state);
         }
 
         private void FindAllComponentInCurrentScene()
         {
-            _pathToCurrentCashedScene = _currentSceneObject.ScenePath;
-            _instanceIDToObject = SceneUtilities.GetAllComponentsInScene<MonoBehaviour>().
-                ToDictionary((value) => value.GetLocalIdentifierInFile());
+            _guidUnityCachedScene = _currentSceneObject.AssetGuid;
+            _instanceIDToObject = EditorSceneManager
+                .GetSceneByPath(_currentSceneObject.LocalAssetPath)
+                .GetRootGameObjects()
+                .SelectMany(gameObject => gameObject.GetComponentsInChildren<MonoBehaviour>())
+                .ToDictionary((value) => value.GetLocalIdentifierInFile());
         }
 
-        private void UpdateButtonOpenSceneAndUnityObjectField()
+        private void ChangeStateButtonOpenSceneAndUnityObjectField(bool state)
         {
-            Scene activeScene = SceneManager.GetActiveScene();
-            bool isNeedScene = activeScene.name == _currentSceneObject.SceneName;
-
-            _openSceneButton.style.display = isNeedScene ? DisplayStyle.None : DisplayStyle.Flex;
-            _objectField.SetValueWithoutNotify(isNeedScene ? _instanceIDToObject[_currentSceneObject.LocalIdentifierInFile] : null);
+            _openSceneButton.style.display = state ? DisplayStyle.None : DisplayStyle.Flex;
+            _objectField.SetValueWithoutNotify(state
+                ? _instanceIDToObject[_currentSceneObject.LocalIdentifierInFile]
+                : null
+            );
         }
 
-        private void OnSceneChanged(Scene last, Scene current)
+        private void OnSceneOpened(Scene scene, OpenSceneMode mode)
         {
-            FindAllComponentInCurrentSceneAndUpdateSceneObjectContainer();
+            if (_currentSceneObject.LocalAssetPath != scene.path)
+                return;
+
+            ChangeStateCurrentScene(true);
         }
 
-        private void OnWantOpenScene()
+        private void OnSceneClosed(Scene scene)
         {
-            OpenScene(_currentSceneObject);
+            if (_currentSceneObject.LocalAssetPath != scene.path)
+                return;
+            
+            ChangeStateCurrentScene(false);
         }
 
-        private void OpenScene(SceneObjectData sceneObject)
-        {
-            EditorSceneManager.OpenScene(sceneObject.ScenePath, OpenSceneMode.Single);
-        }
+        private void OnWantOpenScene() => OpenScene(_currentSceneObject);
+
+        private void OpenScene(SceneObjectData sceneObject) =>
+            EditorSceneManager.OpenScene(sceneObject.LocalAssetPath, OpenSceneMode.Single);
     }
 }

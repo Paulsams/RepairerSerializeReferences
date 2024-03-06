@@ -24,10 +24,7 @@ namespace ChoiceReferenceEditor.Repairer
                 _copyButton.clicked += OnCopyOldToNew;
             }
 
-            private void OnCopyOldToNew()
-            {
-                New.SetValueWithoutNotify(Old.value);
-            }
+            private void OnCopyOldToNew() => New.SetValueWithoutNotify(Old.value);
         }
 
         public delegate void ChangeSingleReferenceHandler(Type type, MissingTypeData missingTypeData);
@@ -37,6 +34,8 @@ namespace ChoiceReferenceEditor.Repairer
         public event ChangeContainerReferenceHandler ChangedContainerReferences;
 
         private readonly ChangerIndexContainer _changerIndex;
+        private readonly DataObjectContainer _dataObjectContainer;
+        private readonly SettingsChangeReferenceContainer _settingsChangeReferenceContainer;
 
         private readonly VisualElement _container;
         private readonly VisualElement _typeInfoContainer;
@@ -44,9 +43,6 @@ namespace ChoiceReferenceEditor.Repairer
         private readonly FieldForTwoValues _classNameField;
         private readonly FieldForTwoValues _assemblyNameField;
         private readonly FieldForTwoValues _namespaceNameField;
-
-        public readonly DataObjectContainer DataObjectContainer;
-        public readonly SettingsChangeReferenceContainer SettingsChangeReferenceContainer;
 
         private IReadonlyCollectionWithEvent<ContainerMissingTypes> _missingTypeContainers;
 
@@ -65,10 +61,10 @@ namespace ChoiceReferenceEditor.Repairer
             _assemblyNameField = new FieldForTwoValues(_typeInfoContainer.Q<VisualElement>("AssemblyNameContainer"));
             _namespaceNameField = new FieldForTwoValues(_typeInfoContainer.Q<VisualElement>("NamespaceNameContainer"));
 
-            DataObjectContainer = new DataObjectContainer(_container);
+            _dataObjectContainer = new DataObjectContainer(_container);
 
-            SettingsChangeReferenceContainer = new SettingsChangeReferenceContainer(_typeInfoContainer);
-            SettingsChangeReferenceContainer.ChangedReference += OnChangedReference;
+            _settingsChangeReferenceContainer = new SettingsChangeReferenceContainer(_typeInfoContainer);
+            _settingsChangeReferenceContainer.ChangedReference += OnChangedReference;
 
             _changerIndex = new ChangerIndexContainer(editorWindow, "Missings not have");
             _changerIndex.ChangedIndex += OnChangedIndex;
@@ -83,13 +79,15 @@ namespace ChoiceReferenceEditor.Repairer
 
             UpdateContainerFromCurrentIndex();
         }
+        
+        public void Reset() => _dataObjectContainer.Reset();
 
         private void UpdateContainerFromCurrentIndex()
         {
             if (_missingTypeContainers.Count == 0)
             {
                 _container.style.display = DisplayStyle.None;
-                DataObjectContainer.ChangeCollectionData(null);
+                _dataObjectContainer.ChangeCollectionData(null);
                 return;
             }
 
@@ -97,10 +95,8 @@ namespace ChoiceReferenceEditor.Repairer
             ChangeCollectionData();
         }
 
-        private void ChangeCollectionData()
-        {
-            DataObjectContainer.ChangeCollectionData(CurrentContainerMissingTypes.ManagedReferencesMissingTypeDatas);
-        }
+        private void ChangeCollectionData() =>
+            _dataObjectContainer.ChangeCollectionData(CurrentContainerMissingTypes.ManagedReferencesMissingTypeDatas);
 
         private void ResetContent()
         {
@@ -139,7 +135,7 @@ namespace ChoiceReferenceEditor.Repairer
             if (isManyUpdateToggle)
                 ChangedContainerReferences?.Invoke(type, CurrentContainerMissingTypes);
             else
-                ChangedSingleReference?.Invoke(type, DataObjectContainer.CurrentMissingType);
+                ChangedSingleReference?.Invoke(type, _dataObjectContainer.CurrentMissingType);
         }
     }
 }

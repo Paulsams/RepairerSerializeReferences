@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 namespace ChoiceReferenceEditor.Repairer
@@ -5,14 +6,12 @@ namespace ChoiceReferenceEditor.Repairer
     public class PrefabObjectData : BaseUnityObjectData
     {
         public readonly GameObject Prefab;
-        public readonly string PathToPrefab;
-
-        public override string LocalAssetPath => PathToPrefab;
+        public override GUID AssetGuid { get; }
 
         public PrefabObjectData(GameObject componentInPrefab, string pathToPrefab)
         {
             Prefab = componentInPrefab;
-            PathToPrefab = pathToPrefab;
+            AssetGuid = AssetDatabase.GUIDFromAssetPath(pathToPrefab);
         }
 
         public override UnityObjectBaseContainer ChangeContent(DataObjectContainer dataObjectContainer)
