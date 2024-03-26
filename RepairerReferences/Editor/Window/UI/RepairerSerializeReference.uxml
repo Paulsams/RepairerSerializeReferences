@@ -46,9 +46,9 @@
                         </ui:VisualElement>
                         <uie:ObjectField label="Object" name="SceneObject" />
                     </ui:VisualElement>
-                    <ui:VisualElement name="PrefabObjectContainer">
-                        <ui:Label text="Prefab Object Info" display-tooltip-when-elided="true" class="headerInfoObject header" />
-                        <uie:ObjectField label="Object Field" name="PrefabObject" />
+                    <ui:VisualElement name="UnityObjectContainer">
+                        <ui:Label text="Unity Object Info" display-tooltip-when-elided="true" class="headerInfoObject header" />
+                        <uie:ObjectField label="Object Field" name="UnityObject" />
                     </ui:VisualElement>
                 </ui:ScrollView>
             </ui:Instance>

@@ -17,7 +17,7 @@ namespace ChoiceReferenceEditor.Repairer
             AssetGuid = AssetDatabase.GUIDFromAssetPath(scene.path);
         }
 
-        public override UnityObjectBaseContainer ChangeContent(DataObjectContainer dataObjectContainer)
+        public override BaseContainer ChangeContent(DataObjectContainer dataObjectContainer)
         {
             dataObjectContainer.SceneObjectContainer.ChangeContent(this);
             return dataObjectContainer.SceneObjectContainer;

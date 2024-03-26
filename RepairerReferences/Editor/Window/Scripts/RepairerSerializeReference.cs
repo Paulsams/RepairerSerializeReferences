@@ -4,10 +4,8 @@ using UnityEngine.UIElements;
 using System.Collections.Generic;
 using System;
 using System.Linq;
-using Paulsams.MicsUtils;
 using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
-using UnityEngine.SceneManagement;
 
 namespace ChoiceReferenceEditor.Repairer
 {
@@ -17,6 +15,7 @@ namespace ChoiceReferenceEditor.Repairer
 
         [SerializeField] private VisualTreeAsset _treeAsset;
 
+        private readonly CollectorMissingTypes _collectorMissingTypes = new CollectorMissingTypes();
         private ListWithEvent<ContainerMissingTypes> _missingTypes;
         private MainContentContainer _mainContentContainer;
 
@@ -52,80 +51,7 @@ namespace ChoiceReferenceEditor.Repairer
                     EditorSceneManager.SaveScene(dirtyScene);
             }
             
-            var missingTypes = new Dictionary<TypeData, ContainerMissingTypes>();
-
-            void AddMissingType(ManagedReferenceMissingType missingType, BaseUnityObjectData unityObject)
-            {
-                var typeData = new TypeData(missingType);
-                var missingTypeData = new MissingTypeData(missingType, unityObject);
-                if (missingTypes.TryGetValue(typeData, out var containerMissingTypes) == false)
-                {
-                    containerMissingTypes = new ContainerMissingTypes(typeData);
-                    missingTypes.Add(typeData, containerMissingTypes);
-                }
-
-                containerMissingTypes.Add(missingTypeData);
-            }
-
-            Scene previewScene = EditorSceneManager.NewPreviewScene();
-
-            foreach (var pathToPrefab in AssetDatabaseUtilities.GetPathToAllPrefabsAssets()
-                         .Where((path) => path.StartsWith("Assets/")))
-            {
-                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(pathToPrefab);
-                PrefabUtility.LoadPrefabContentsIntoPreviewScene(pathToPrefab, previewScene);
-                var copyPrefab = previewScene.GetRootGameObjects()[0];
-
-                var componentsPrefab = prefab.GetComponentsInChildren<MonoBehaviour>();
-                var componentsCopyPrefab = copyPrefab.GetComponentsInChildren<MonoBehaviour>();
-
-                for (int i = 0; i < componentsCopyPrefab.Length; ++i)
-                {
-                    var monoBehaviour = componentsCopyPrefab[i];
-                    if (SerializationUtility.HasManagedReferencesWithMissingTypes(monoBehaviour))
-                    {
-                        foreach (var missingType in SerializationUtility.GetManagedReferencesWithMissingTypes(monoBehaviour))
-                        {
-                            var prefabObject = new PrefabObjectData(componentsPrefab[i].gameObject, pathToPrefab);
-
-                            AddMissingType(missingType, prefabObject);
-                        }
-                    }
-                }
-
-                DestroyImmediate(copyPrefab);
-            }
-
-            EditorSceneManager.ClosePreviewScene(previewScene);
-
-            try
-            {
-                foreach (var scene in AssetDatabaseUtilities.GetAllScenesInAssets())
-                {
-                    var gameObjects = scene.GetRootGameObjects();
-
-                    foreach (var objectOnScene in gameObjects)
-                    {
-                        foreach (var monoBehaviour in objectOnScene.GetComponentsInChildren<MonoBehaviour>())
-                        {
-                            if (SerializationUtility.HasManagedReferencesWithMissingTypes(monoBehaviour) == false)
-                                continue;
-                            
-                            foreach (var missingType in SerializationUtility.GetManagedReferencesWithMissingTypes(monoBehaviour))
-                            {
-                                var sceneObject = new SceneObjectData(monoBehaviour.GetLocalIdentifierInFile(), scene);
-                                AddMissingType(missingType, sceneObject);
-                            }
-                        }
-                    }
-                }
-            }
-            catch { /*ignored*/ }
-
-            _missingTypes = new ListWithEvent<ContainerMissingTypes>(missingTypes
-                .Select((typeAndContainer) => typeAndContainer.Value)
-                .ToList());
-
+            _missingTypes = _collectorMissingTypes.Collect();
             return true;
         }
 

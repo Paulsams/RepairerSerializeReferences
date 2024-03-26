@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 
 namespace ChoiceReferenceEditor.Repairer
 {
-    public class SceneObjectContainer : UnityObjectBaseContainer
+    public class SceneObjectContainer : BaseContainer
     {
         private readonly TextField _sceneNameField;
         private readonly Button _openSceneButton;
@@ -23,9 +23,9 @@ namespace ChoiceReferenceEditor.Repairer
         public SceneObjectContainer(VisualElement contentContainer)
             : base(contentContainer.Q<VisualElement>("SceneObjectContainer"))
         {
-            _sceneNameField = _container.Q<TextField>("SceneName");
-            _openSceneButton = _container.Q<Button>("OpenScene");
-            _objectField = _container.Q<ObjectField>("SceneObject");
+            _sceneNameField = Container.Q<TextField>("SceneName");
+            _openSceneButton = Container.Q<Button>("OpenScene");
+            _objectField = Container.Q<ObjectField>("SceneObject");
 
             _openSceneButton.clicked += OnWantOpenScene;
         }

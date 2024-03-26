@@ -7,6 +7,6 @@ namespace ChoiceReferenceEditor.Repairer
         public string LocalAssetPath => AssetDatabase.GUIDToAssetPath(AssetGuid);
         public abstract GUID AssetGuid { get; }
 
-        public abstract UnityObjectBaseContainer ChangeContent(DataObjectContainer dataObjectContainer);
+        public abstract BaseContainer ChangeContent(DataObjectContainer dataObjectContainer);
     }
 }

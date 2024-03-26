@@ -10,12 +10,12 @@ namespace ChoiceReferenceEditor.Repairer
         private readonly LongField _referenceIdField;
         private readonly TextField _serializedDataField;
 
-        public readonly PrefabObjectContainer PrefabObjectContainer;
+        public readonly UnityObjectContainer UnityObjectContainer;
         public readonly SceneObjectContainer SceneObjectContainer;
 
         private readonly ChangerIndexContainer _changerIndex;
 
-        private UnityObjectBaseContainer _currentContainerForObject;
+        private BaseContainer _currentContainerForObject;
 
         private IReadonlyCollectionWithEvent<MissingTypeData> _missingTypesData;
 
@@ -36,7 +36,7 @@ namespace ChoiceReferenceEditor.Repairer
             _changerIndex.ChangedIndex += OnChangedIndex;
 
             SceneObjectContainer = new SceneObjectContainer(_dataObjectContainer);
-            PrefabObjectContainer = new PrefabObjectContainer(_dataObjectContainer);
+            UnityObjectContainer = new UnityObjectContainer(_dataObjectContainer);
         }
 
         public void Reset()
