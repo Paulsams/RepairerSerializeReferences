@@ -7,7 +7,7 @@
     </uie:Toolbar>
     <ui:Instance template="ChangerContainer" name="ChangerContainer" style="flex-shrink: 0;" />
     <ui:VisualElement name="MainContentContainer" class="contentContainer border mainContentContainer" style="flex-grow: 1; padding-top: 3px; padding-left: 3px; padding-right: 3px; padding-bottom: 3px;">
-        <ui:VisualElement name="TypeInfoContainer">
+        <ui:VisualElement name="TypeInfoContainer" style="flex-shrink: 0;">
             <uie:Toolbar class="unity-base-field">
                 <ui:Label text="Property Name" display-tooltip-when-elided="true" class="unity-base-field__label" />
                 <ui:VisualElement class="containerTwoValues" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">

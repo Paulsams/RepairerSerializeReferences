@@ -17,10 +17,10 @@
 }
 
 .border {
-    border-left-color: rgba(137, 137, 137, 255);
-    border-right-color: rgba(137, 137, 137, 255);
-    border-top-color: rgba(137, 137, 137, 255);
-    border-bottom-color: rgba(137, 137, 137, 255);
+    border-left-color: rgb(137, 137, 137);
+    border-right-color: rgb(137, 137, 137);
+    border-top-color: rgb(137, 137, 137);
+    border-bottom-color: rgb(137, 137, 137);
     border-left-width: 4px;
     border-right-width: 4px;
     border-top-width: 4px;
@@ -44,4 +44,5 @@
     margin-right: -3px;
     margin-top: 4px;
     margin-bottom: 4px;
+    flex-shrink: 0;
 }

@@ -100,8 +100,7 @@ namespace ChoiceReferenceEditor.Repairer
 
             try
             {
-                foreach (var scene in AssetDatabaseUtilities.GetPathsToAllScenesInProject()
-                             .Where((path) => path.path.StartsWith("Assets/")))
+                foreach (var scene in AssetDatabaseUtilities.GetAllScenesInAssets())
                 {
                     var gameObjects = scene.GetRootGameObjects();
 
