@@ -1,9 +1,9 @@
 {
   "name": "com.paulsams.repairer-serialize-references",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "displayName": "RepairerSerializeReferences",
   "dependencies": {
-    "com.paulsams.misc-utilities": "2.0.0"
+    "com.paulsams.misc-utilities": "3.0.0"
   },
   "description": "Editor Window to fix Serialize Reference after changing/renaming a class, assembly, or namespace.",
   "unity": "2021.2",

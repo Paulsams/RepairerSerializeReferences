@@ -2,7 +2,6 @@
     "name": "Paulsams.RepairerSerializeReferences.Editor",
     "rootNamespace": "",
     "references": [
-        "Paulsams.MiscUtilities",
         "Paulsams.MiscUtilities.Editor"
     ],
     "includePlatforms": [

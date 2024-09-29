@@ -18,7 +18,7 @@ namespace ChoiceReferenceEditor.Repairer
             CollectByPrefabs();
             CollectByScriptableObjects();
             CollectByScenes();
-            
+
             ListWithEvent<ContainerMissingTypes> answer = new ListWithEvent<ContainerMissingTypes>(_missingTypes
                 .Select((typeAndContainer) => typeAndContainer.Value)
                 .ToList());
@@ -30,7 +30,7 @@ namespace ChoiceReferenceEditor.Repairer
         {
             Scene previewScene = EditorSceneManager.NewPreviewScene();
 
-            foreach (var pathToPrefab in AssetDatabaseUtilities.GetPathToAllPrefabsAssets()
+            foreach (var pathToPrefab in AssetDatabase.FindAssets(AssetDatabaseUtilities.FilterKeys.Prefabs)
                          .Where((path) => path.StartsWith("Assets/")))
             {
                 var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(pathToPrefab);
@@ -45,8 +45,9 @@ namespace ChoiceReferenceEditor.Repairer
                     var monoBehaviour = componentsCopyPrefab[i];
                     if (SerializationUtility.HasManagedReferencesWithMissingTypes(monoBehaviour) == false)
                         continue;
-                    
-                    foreach (var missingType in SerializationUtility.GetManagedReferencesWithMissingTypes(monoBehaviour))
+
+                    foreach (var missingType in
+                             SerializationUtility.GetManagedReferencesWithMissingTypes(monoBehaviour))
                     {
                         var prefabObject = new UnityObjectData(componentsPrefab[i].gameObject, pathToPrefab);
 
@@ -59,17 +60,17 @@ namespace ChoiceReferenceEditor.Repairer
 
             EditorSceneManager.ClosePreviewScene(previewScene);
         }
-        
+
         private void CollectByScriptableObjects()
         {
-            foreach (var pathToPrefab in AssetDatabaseUtilities.GetAssetsPathsFromFilenameExtension("asset")
+            foreach (var pathToPrefab in AssetDatabase.FindAssets(AssetDatabaseUtilities.FilterKeys.ScriptableObjects)
                          .Where((path) => path.StartsWith("Assets/")))
             {
                 var scriptableObject = AssetDatabase.LoadAssetAtPath<ScriptableObject>(pathToPrefab);
 
                 if (SerializationUtility.HasManagedReferencesWithMissingTypes(scriptableObject) == false)
                     continue;
-                
+
                 foreach (var missingType in SerializationUtility.GetManagedReferencesWithMissingTypes(scriptableObject))
                 {
                     var prefabObject = new UnityObjectData(scriptableObject, pathToPrefab);
@@ -92,8 +93,9 @@ namespace ChoiceReferenceEditor.Repairer
                         {
                             if (SerializationUtility.HasManagedReferencesWithMissingTypes(monoBehaviour) == false)
                                 continue;
-                        
-                            foreach (var missingType in SerializationUtility.GetManagedReferencesWithMissingTypes(monoBehaviour))
+
+                            foreach (var missingType in SerializationUtility.GetManagedReferencesWithMissingTypes(
+                                         monoBehaviour))
                             {
                                 var sceneObject = new SceneObjectData(monoBehaviour.GetLocalIdentifierInFile(), scene);
                                 AddMissingType(missingType, sceneObject);
@@ -102,9 +104,12 @@ namespace ChoiceReferenceEditor.Repairer
                     }
                 }
             }
-            catch { /*ignored*/ }
+            catch
+            {
+                /*ignored*/
+            }
         }
-        
+
         private void AddMissingType(ManagedReferenceMissingType missingType, BaseUnityObjectData unityObject)
         {
             var typeData = new TypeData(missingType);

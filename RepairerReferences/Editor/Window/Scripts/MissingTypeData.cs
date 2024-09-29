@@ -18,7 +18,7 @@ namespace ChoiceReferenceEditor.Repairer
         }
     }
 
-    public struct TypeData
+    public readonly struct TypeData : IEqualityComparer<TypeData>, IEquatable<TypeData>
     {
         public readonly string AssemblyName;
         public readonly string NamespaceName;
@@ -29,6 +29,23 @@ namespace ChoiceReferenceEditor.Repairer
             AssemblyName = missingType.assemblyName;
             NamespaceName = missingType.namespaceName;
             ClassName = missingType.className;
+        }
+
+        public bool Equals(TypeData x, TypeData y) =>
+            x.AssemblyName == y.AssemblyName && x.NamespaceName == y.NamespaceName && x.ClassName == y.ClassName;
+
+        public int GetHashCode(TypeData obj) =>
+            HashCode.Combine(obj.AssemblyName, obj.NamespaceName, obj.ClassName);
+
+        public bool Equals(TypeData other) =>
+            AssemblyName == other.AssemblyName && NamespaceName == other.NamespaceName && ClassName == other.ClassName;
+
+        public override bool Equals(object obj)
+            => obj is TypeData other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(AssemblyName, NamespaceName, ClassName);
         }
     }
 
@@ -88,9 +105,11 @@ namespace ChoiceReferenceEditor.Repairer
     {
         public readonly TypeData TypeData;
 
-        private readonly ListWithEvent<MissingTypeData> _managedReferencesMissingTypeDatas = new ListWithEvent<MissingTypeData>();
+        private readonly ListWithEvent<MissingTypeData> _managedReferencesMissingTypeDatas =
+            new ListWithEvent<MissingTypeData>();
 
-        public IReadonlyCollectionWithEvent<MissingTypeData> ManagedReferencesMissingTypeDatas => _managedReferencesMissingTypeDatas;
+        public IReadonlyCollectionWithEvent<MissingTypeData> ManagedReferencesMissingTypeDatas =>
+            _managedReferencesMissingTypeDatas;
 
         public ContainerMissingTypes(TypeData typeData)
         {
@@ -99,7 +118,8 @@ namespace ChoiceReferenceEditor.Repairer
 
         public void Add(MissingTypeData missingTypeData) => _managedReferencesMissingTypeDatas.Add(missingTypeData);
 
-        public void Remove(MissingTypeData missingTypeData) => _managedReferencesMissingTypeDatas.Remove(missingTypeData);
+        public void Remove(MissingTypeData missingTypeData) =>
+            _managedReferencesMissingTypeDatas.Remove(missingTypeData);
 
         public void RemoveAt(int index) => _managedReferencesMissingTypeDatas.RemoveAt(index);
     }
