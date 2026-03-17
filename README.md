@@ -1,7 +1,7 @@
 # RepairerSerializeReferences
 Editor Window to fix Serialize Reference after changing/renaming a class, assembly, or namespace.
 
-**IMPORTANT**: so far only from 2021.2 Unity Version.
+**IMPORTANT**: so far only from 2021.2 Unity Version (but I raised the minimum version to 2022.1).
 
 [Документация на русском](Documentation~/RU.md)
 

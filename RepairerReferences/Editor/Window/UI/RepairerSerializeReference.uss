@@ -1,8 +1,7 @@
 .header {
     -unity-text-align: middle-center;
     font-size: 16px;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding: 4px 0;
 }
 
 .oneValueFromManyValues {
@@ -17,14 +16,8 @@
 }
 
 .border {
-    border-left-color: rgb(137, 137, 137);
-    border-right-color: rgb(137, 137, 137);
-    border-top-color: rgb(137, 137, 137);
-    border-bottom-color: rgb(137, 137, 137);
-    border-left-width: 4px;
-    border-right-width: 4px;
-    border-top-width: 4px;
-    border-bottom-width: 4px;
+    border-color: rgb(137, 137, 137);
+    border-width: 2px;
 }
 
 .mainContentContainer {
@@ -32,7 +25,7 @@
 }
 
 .separator {
-    border-top-width: 2px;
+    border-top-width: 1px;
     border-top-color: rgb(137, 137, 137);
     border-bottom-width: 2px;
     border-left-width: 0;
@@ -40,9 +33,6 @@
     border-left-color: rgb(137, 137, 137);
     border-right-color: rgb(137, 137, 137);
     border-bottom-color: rgb(137, 137, 137);
-    margin-left: -3px;
-    margin-right: -3px;
-    margin-top: 4px;
-    margin-bottom: 4px;
+    margin: 4px -3px;
     flex-shrink: 0;
 }

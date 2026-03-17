@@ -30,9 +30,9 @@ namespace ChoiceReferenceEditor.Repairer
         {
             Scene previewScene = EditorSceneManager.NewPreviewScene();
 
-            foreach (var pathToPrefab in AssetDatabase.FindAssets(AssetDatabaseUtilities.FilterKeys.Prefabs)
-                         .Where((path) => path.StartsWith("Assets/")))
+            foreach (var guid in AssetDatabase.FindAssets(AssetDatabaseUtilities.FilterKeys.Prefabs, AssetDatabaseUtilities.AssetsFolders))
             {
+                var pathToPrefab = AssetDatabase.GUIDToAssetPath(guid);
                 var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(pathToPrefab);
                 PrefabUtility.LoadPrefabContentsIntoPreviewScene(pathToPrefab, previewScene);
                 var copyPrefab = previewScene.GetRootGameObjects()[0];
@@ -63,17 +63,17 @@ namespace ChoiceReferenceEditor.Repairer
 
         private void CollectByScriptableObjects()
         {
-            foreach (var pathToPrefab in AssetDatabase.FindAssets(AssetDatabaseUtilities.FilterKeys.ScriptableObjects)
-                         .Where((path) => path.StartsWith("Assets/")))
+            foreach (var guid in AssetDatabase.FindAssets(AssetDatabaseUtilities.FilterKeys.ScriptableObjects, AssetDatabaseUtilities.AssetsFolders))
             {
-                var scriptableObject = AssetDatabase.LoadAssetAtPath<ScriptableObject>(pathToPrefab);
+                var pathToObject = AssetDatabase.GUIDToAssetPath(guid);
+                var scriptableObject = AssetDatabase.LoadAssetAtPath<ScriptableObject>(pathToObject);
 
                 if (SerializationUtility.HasManagedReferencesWithMissingTypes(scriptableObject) == false)
                     continue;
 
                 foreach (var missingType in SerializationUtility.GetManagedReferencesWithMissingTypes(scriptableObject))
                 {
-                    var prefabObject = new UnityObjectData(scriptableObject, pathToPrefab);
+                    var prefabObject = new UnityObjectData(scriptableObject, pathToObject);
                     AddMissingType(missingType, prefabObject);
                 }
             }
