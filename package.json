@@ -1,6 +1,6 @@
 {
   "name": "com.paulsams.repairer-serialize-references",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "displayName": "RepairerSerializeReferences",
   "dependencies": {
     "com.paulsams.misc-utilities": "4.0.0"
